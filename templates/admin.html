@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> Project Argos | Admin </title>
+    <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico">
+</head>
+
+<style type="text/css">
+    fieldset {
+        width: 500px;
+    }
+</style>
+
+<body>
+
+    <h1> ADMIN </h1>
+
+    <!-- Create new user -->
+    <form action="/create_user" method="post">
+        <fieldset>
+            <legend> Create Account</legend>
+            Username: <input type="text" name="user" required><br>
+            Given Name: <input type="text" name="fname"><br>
+            Family Name: <input type="text" name="lname"><br>
+            Password: <input type="password" name="pswd" required><br>
+            Type: <select name="type">
+                <option value="A">Admin</option>
+                <option value="C">Consultant</option>
+            </select>
+            <br><br>
+            <input type="submit">
+            {% if userTaken != "" %}
+            <br><br>{{userTaken}}
+            {%endif%}
+        </fieldset>
+    </form>
+
+    <br><br>
+
+    <!-- Delete user -->
+    <form action="/del_user" method="post">
+        <fieldset>
+            <legend> Delete Account</legend>
+            Username: <select name="user">
+                {% for user in users%}
+                <option value="{{user}}">{{user}}</option>
+                {%endfor%}
+            </select>
+            <br><br>
+            <input type="submit">
+        </fieldset>
+    </form>
+
+    <br><br>
+
+    <!-- Change Password -->
+    <form action="/change_pswd" method="post">
+        <fieldset>
+            <legend> Change Password </legend>
+            Username: <select name="user">
+                {% for user in users%}
+                <option value="{{user}}">{{user}}</option>
+                {%endfor%}
+            </select> <br>
+            Password: <input type="password" name="pswd" required>
+            <br><br>
+            <input type="submit">
+        </fieldset>
+    </form>
+
+    <br><br>
+
+    <!-- Create Client -->
+    <form action="/create_client" method="post">
+        <fieldset>
+            <legend> Create Client </legend>
+            Title: <select name="title">
+                <option value="Mr">Mr</option>
+                <option value="Mrs">Mrs</option>
+                <option value="Ms">Ms</option>
+                <option value="Miss">Miss</option>
+                <option value="Dr">Dr</option>
+            </select> <br>
+            Given Name: <input type="text" name="fname" required> <br>
+            Family Name: <input type="text" name="lname" required> <br>
+            Principal: <input type="number" name="principal" value=0 required> <br>
+            <br><br>
+            <input type="submit">
+        </fieldset>
+    </form>
+
+    <br><br>
+
+    <!-- Delete Client -->
+    <form action="/del_client" method="post">
+        <fieldset>
+            <legend> Delete Client </legend>
+            Client: <select name="client">
+                {% for client in clients %}
+                <option value="{{client['id']}}">{{client['name']}}</option>
+                {%endfor%}
+            </select>
+            <br><br>
+            <input type="submit">
+        </fieldset>
+    </form>
+
+    <br><br>
+
+    <!-- Grant access of consultant to client -->
+    <form action="/grant_access" method="post">
+        <fieldset>
+            <legend> Grant Access </legend>
+            Consultant: <select name="consult">
+                {% for consult in consultants%}
+                <option value="{{consult}}">{{consult}}</option>
+                {%endfor%}
+            </select><br>
+            Client: <select name="client">
+                {% for client in clients %}
+                <option value="{{client['id']}}">{{client['name']}}</option>
+                {%endfor%}
+            </select>
+            <br><br>
+            <input type="submit">
+        </fieldset>
+    </form>
+
+    <br><br>
+
+    <!-- Revoke access of consultant to client -->
+    <form action="/revoke_access" method="post">
+        <fieldset>
+            <legend> Revoke Access </legend>
+            Consultant: <select name="consult">
+                {% for consult in consultants%}
+                <option value="{{consult}}">{{consult}}</option>
+                {%endfor%}
+            </select><br>
+            Client: <select name="client">
+                {% for client in clients %}
+                <option value="{{client['id']}}">{{client['name']}}</option>
+                {%endfor%}
+            </select>
+            <br><br>
+            <input type="submit">
+        </fieldset>
+    </form>
+
+    <br><br>
+
+    <!-- Set stock quantity for given client -->
+    <form action="/set_quantity" method="post">
+        <fieldset>
+            <legend> Set Stock Quantity </legend>
+            Client: <select name="client">
+                {% for client in clients %}
+                <option value="{{client['id']}}">{{client['name']}}</option>
+                {%endfor%}
+            </select><br>
+            Stock: <select name="stock">
+                {% for stock in stocks %}
+                <option value="{{stock}}">{{stock}}</option>
+                {%endfor%}
+            </select><br>
+            Quantity: <input type="number" name="quantity" value=0 required> <br>
+            <br><br>
+            <input type="submit">
+        </fieldset>
+    </form>
+
+    <br><br>
+
+    <!-- Logout -->
+    <form action="/">
+        <input type="submit" value="Logout">
+    </form>
+    
+    <script type="text/javascript" src="{{ url_for('static', filename='js/admin.js')}}"></script>
+
+</body>
+
+</html>

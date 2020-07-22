@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title> Project Argos | Home Page </title>
+	<link rel="shortcut icon" type="image/x-icon" href="../static/img/favicon.ico">
+
+	<link rel="stylesheet" type="text/css" href="../static/styles/vendor.css">
+	<link rel="stylesheet" href="../static/styles/alchemy.css">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:400,700" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="../static/styles/home.css">
+
+	<!-- for graphing stocks using chartist.js -->
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/chartist.min.css') }}">
+</head>
+
+<body>
+
+	<!-- Left Panel -->
+	<nav class="navbar navbar-vertical fixed-left navbar-expand-md navbar-light">
+		<div class="container">
+
+			<!-- Brand -->
+			<a class="navbar-brand" href="/home">
+			  <img src="../static/img/logobanner.png" class="navbar-brand-img
+			  mx-auto" alt="...">
+			</a>
+
+			<div style ="float:left">
+				<p style="font-weight: bold; color: grey; display: inline; font-size: 1.5rem"> Select Client:&nbsp</p>
+						<select id="client_list">
+			                {% for client in client_list %}
+			                <option value="{{client['id']}}"> {{client['name']}} </option>
+			                {% endfor %}
+			            </select>
+			</div>
+			<br>
+
+			<div class="tab-container">
+				<ul class="nav nav-tabs">
+					<li class="active"><a data-toggle="tab" href="#client">Summary</a></li>
+					<li><a data-toggle="tab" href="#Transactions">Transactions</a></li>
+					<li><a data-toggle="tab" href="#Notes">Notes</a></li>
+				</ul>
+
+				<div class="tab-content">
+					<div id="client" class="tab-pane in active">
+						<br>
+						<span style="display:inline; font-weight: bold;"> Total Portfolio Value:</span> $<span id="portfolio_value"> </span>
+						<br>
+						<span style="display:inline; font-weight: bold;"> Change in Portfolio Value:</span> <span id="percentage_of_change"></span>
+						<div style="display: inline-block;position: relative;top: -2px;">
+							<img id="arrow" src="#" class="navbar-brand-img" height="16" alt="?">
+						</div>
+						<br>
+						<span style="display:inline; font-weight: bold;"> Principal:</span> $<span id="client_principal"> </span>
+						<br>
+						<br>
+
+						<legend style="font-weight: bold; color: grey"> Top 3 Stock Movements
+							&nbsp;
+							<div class="img-wrap" style="display: inline-block;">
+								<img src="../static/img/info.png" height="16" alt="?"
+								title="Displays the top 3 stocks with the biggest changes in prices in your portfolio as well as across the entire ASX from the last day. Clicking on one of these will show more information in the 'Stock Information' tab.'">
+							</div>
+						</legend>
+
+						<div style="font-weight: bold;"> In Portfolio </div>
+						&nbsp;&nbsp;&nbsp;&nbsp;<span style="display:inline; font-weight: bold;">1</span> <span id="ms_p1"> - </span>
+						<div style="display: inline-block;position: relative;top: -2px;">
+							<img id="p1" src="#" class="navbar-brand-img" height="16" alt="?">
+						</div>
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;<span style="display:inline; font-weight: bold;">2</span> <span id="ms_p2"> - </span>
+						<div style="display: inline-block;position: relative;top: -2px;">
+							<img id="p2" src="#" class="navbar-brand-img" height="16" alt="?">
+						</div>
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;<span style="display:inline; font-weight: bold;">3</span> <span id="ms_p3"> - </span>
+						<div style="display: inline-block;position: relative;top: -2px;">
+							<img id="p3" src="#" class="navbar-brand-img" height="16" alt="?">
+						</div>
+						<br>
+
+						<div style="height: 8px;"></div>
+
+						<div style="font-weight: bold;"> Across ASX </div>
+						&nbsp;&nbsp;&nbsp;&nbsp;<span style="display:inline; font-weight: bold;">1</span> <span id="ms_m1"> - </span>
+						<div style="display: inline-block;position: relative;top: -2px;">
+							<img id="m1" src="#" class="navbar-brand-img" height="16" alt="?">
+						</div>
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;<span style="display:inline; font-weight: bold;">2</span> <span id="ms_m2"> - </span>
+						<div style="display: inline-block;position: relative;top: -2px;">
+							<img id="m2" src="#" class="navbar-brand-img" height="16" alt="?">
+						</div>
+						<br>
+						&nbsp;&nbsp;&nbsp;&nbsp;<span style="display:inline; font-weight: bold;">3</span> <span id="ms_m3"> - </span>
+						<div style="display: inline-block;position: relative;top: -2px;">
+							<img id="m3" src="#" class="navbar-brand-img" height="16" alt="?">
+						</div>
+						<br>
+						<br>
+
+						<legend style="font-weight: bold; color: grey"> Portfolio Breakdown by Sector </legend>
+						<div class="ct-chart" id="chart_industries" style="width:90%; padding-left:30px">
+								<canvas id="chart-area" width="333" height="333" />
+						</div>
+						<!-- <div class="ct-chart" id="chart_industries"></div> -->
+						<!-- <br>
+						<legend style="font-weight: bold; color: grey"> Make New Notes
+							&nbsp;
+							<div class="img-wrap" style="display: inline-block;">
+								<img src="../static/img/info.png" height="16" alt="?"
+								title="Notes are unique for each client and are automatically saved. They are archived as old notes once a new day roles around.">
+							</div>
+						</legend>
+						<textarea rows="4" cols="40" style="resize:vertical;" id='current_note'></textarea>
+						<br>
+						<br>
+						<legend style="font-weight: bold; color: grey"> Previous Notes </legend>
+						<div id="notes-container"></div> -->
+
+					</div>
+					<div id="Transactions" class="tab-pane fade">
+
+						<br>
+						<form onsubmit="new_transac(); return false;">
+							<legend style="font-weight: bold; color: grey"> Record New Transaction
+								&nbsp;
+								<div class="img-wrap" style="display: inline-block;">
+									<img src="../static/img/info.png" height="16" alt="?"
+									title="Log a client's transaction into the system by providing all relevant information. Client portfolio will update automatically. Clicking on a stock in the central graph will select it in this transaction.">
+								</div>
+							</legend>
+							<div id="label" style ="font-weight: bold;"> Action: </div>
+							<div id="field">
+								<label class="radio-inline">
+											<input type="radio" name="action" id="transac_buy" checked>Buy
+										</label>
+								<label class="radio-inline">
+											<input type="radio" name="action" id="transac_sell">Sell
+										</label>
+							</div> <br>
+							<div style="height: 8px;"></div>
+							<div id="label" style ="font-weight: bold;"> Stock: </div>
+							<div id="field">
+								<select id="transac_stock">
+						                {% for stock in stock_list %}
+						                <option value="{{stock}}">{{stock}}</option>
+						                {%endfor%}
+						            	</select>
+							</div> <br>
+							<div style="height: 8px;"></div>
+							<div id="label" style ="font-weight: bold;"> Unit Price: </div>
+							<div id="field">
+								<input type="number" id="transac_price" value=0 min=0.0001 step=0.0001 required>
+							</div> <br>
+							<div style="height: 8px;"></div>
+							<div id="label" style ="font-weight: bold;"> Quantity: </div>
+							<div id="field">
+								<input type="number" id="transac_quantity" value=0 min=0.0001 step=0.0001 required>
+							</div> <br>
+							<div style="height: 8px;"></div>
+							<div id="label" style ="font-weight: bold;"> Note: </div>
+							<div id="field">
+								<input type="text" id="transac_note" maxlength="200">
+							</div> <br>
+							<div style="height: 8px;"></div>
+							<div id="label" style ="font-weight: bold;">Transaction Value: </div>
+							<div id="field">
+								<div id="transac_cost">$0.00</div>
+							</div> <br>
+							<div style="height: 12px;"></div>
+							<center>
+								<p id="transac_resp"></p>
+								<input type="submit" style="background-color:grey;color:#fff;border-radius:10px;"/>
+							</center>
+						</form>
+
+						<div style="height: 24px;"></div>
+
+						<form onsubmit="update_principal(); return false;">
+							<legend style="font-weight: bold; color: grey"> Record Principal Update
+								&nbsp;
+								<div class="img-wrap" style="display: inline-block;">
+									<img src="../static/img/info.png" height="16" alt="?"
+									title="Log the deposit or withdrawal of funds from the client's acccount.">
+								</div>
+							</legend>
+							<div id="label" style ="font-weight: bold;"> Current Principal: </div>
+							<div id="field">
+								$<span id="update_princ_cur"> </span>
+							</div> <br>
+							<div style="height: 8px;"></div>
+							<div id="label" style ="font-weight: bold;"> Action: </div>
+							<div id="field">
+								<label class="radio-inline">
+											<input type="radio" name="action" id="update_princ_deposit" checked> Deposit
+										</label>
+								<label class="radio-inline">
+											<input type="radio" name="action" id="update_princ_withdrawal"> Withdraw
+										</label>
+							</div> <br>
+							<div style="height: 8px;"></div>
+							<div id="label" style ="font-weight: bold;"> Quantity: </div>
+							<div id="field">
+								<input type="number" id="update_princ_quant" value=0 min=0.01 step=0.01 required>
+							</div> <br>
+							<div style="height: 20px;"></div>
+							<center>
+								<input type="submit" style="background-color:grey;color:#fff;border-radius:10px;"/>
+							</center>
+						</form>
+
+						<div style="height: 24px;"></div>
+
+						<legend style="font-weight: bold; color: grey"> Previous Transactions
+							<div class="img-wrap" style="display: inline-block;">
+								<img src="../static/img/info.png" height="16" alt="?"
+								title="Look at past transactions made for this client. Search by date, stock, bought/sold or price.">
+							</div>
+						</legend>
+
+						<div style="height: 8px;"></div>
+						<center>
+							<input type="text" id="transac_filter" onkeyup="transacFilter()" placeholder="Search transactions ...">
+						</center>
+						<div style="height: 12px;"></div>
+						<div id="transactions-container"></div>
+
+					</div>
+
+					<div id="Notes" class="tab-pane fade">
+						<br>
+						<legend style="font-weight: bold; color: grey"> Make New Notes
+							&nbsp;
+							<div class="img-wrap" style="display: inline-block;">
+								<img src="../static/img/info.png" height="16" alt="?"
+								title="Notes made for clients will be automatically saved, and archived at the end of each day.">
+							</div>
+							<div id="saved" style="display: inline-block; float: right; margin-right: 7px;"></div>
+						</legend>
+						<textarea rows="4" cols="43" style="resize:vertical;width:100%" id='current_note'></textarea>
+						<br>
+						<br>
+						<legend style="font-weight: bold; color: grey"> Previous Notes </legend>
+						<div id="notes-container"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</nav>
+
+	<!-- Right Panel -->
+
+	<div class="main-content">
+
+		<!-- HEADER -->
+		<div class="header bg-dark pb-5">
+			<div class="container-fluid" style="padding-top: 0px">
+
+				<!-- Body -->
+				<div class="header-body">
+					<div class="row align-items-end">
+						<div class="col">
+
+							<!-- Pretitle -->
+							<h6 class="header-pretitle text-secondary"> Overview: Dashboard</h6>
+
+							<!-- Title -->
+							<h1 class="header-title text-white"><span style="float:left;">Welcome {{name}}</span></h1>
+							&nbsp; &nbsp;
+							<div class="img-wrap" style="display: inline-block; position:relative; top:5px;">
+								<img src="../static/img/info.png" height="16" alt="?"
+								title="This SVE graph provides an easy-to-navigate overview of your client's current portfolio, watchlist and AI recommendations. Green stocks are 'buy' and red stocks 'sell' recommendations. Hover over or click on any stock to display more information.">
+							</div>
+							<div style="float:right;">
+								<div class="img-wrap" style="display: inline-block;">
+									<img src="../static/img/info.png" height="16" alt="?"
+									title="Download a CSV of ASX stock data to take with you offline or perform analysis on.">
+								</div>
+								&nbsp;
+								<span style="margin-right: 20px"> <a class="header-pretitle text-secondary" href="/stockData"> Download Stock Data </a></span>
+								<span> <a class="header-pretitle text-secondary" href="/">LOGOUT</a></span>
+							</div>
+
+						</div>
+						<div class="col-auto">
+
+						</div>
+					</div><!-- / .row -->
+				</div><!-- / .header-body -->
+
+				<hr class="my-3">
+
+				<div class="header-footer">
+
+					<div id='popup-container' style="position:relative; z-index: 999; max-width:200px;">
+						<div style="position:absolute;" id="popup-hover" class = "popup"></div>
+					</div>
+
+				  <!-- Chart -->
+				  <div class="chart">
+					<div class="alchemy" id="alchemy"></div>
+				  </div>
+
+				  <div style="position:relative; float: right; z-index: 999;">
+				  	<img id ="chart-legend" src="../static/img/legend.png" alt="?" style="position:absolute; bottom: 12px; right: 10px;">
+				  </div>
+
+				</div>
+			</div>
+		</div>
+		<!-- / .header -->
+
+		<!-- CARDS -->
+		<div class="container-fluid" style="position: relative; top: -15px;">
+			<div class="row">
+				<div class="col-12 col-xl-4">
+
+					<!-- Stocks -->
+					<div class="card">
+						<div class="card-header">
+							<div class="row align-items-center">
+								<div class="col">
+
+									<!-- Title -->
+									<h4 class="card-header-title" style="display: inline-block;"><b>Stock Information</b></h4>
+									&nbsp;
+									<div class="img-wrap" style="display: inline-block;">
+										<img src="../static/img/info.png" class="navbar-brand-img" alt="?"
+										title="Select any ASX here, or click on one in the SVE, to view a summary of it. You can also add stocks to your client's watchlist using the toggle.">
+									</div>
+								</div>
+								<div class="col-auto mr--3">
+
+									<!-- Caption -->
+									<span class="text-muted"> Watchlist</span>
+
+								</div>
+								<div class="col-auto">
+
+									<!-- Toggle -->
+									<div class="custom-control custom-checkbox-toggle">
+										<input type="checkbox" class="custom-control-input" id="cardToggle" data-toggle="chart" data-target="#ordersChart" data-add='{"data":{"datasets":[{"data":[15,10,20,12,7,0,8,16,18,16,10,22],"backgroundColor":"#1e4547","label":"Affiliate"}]}}'>
+										<label class="custom-control-label" for="cardToggle" id="toggle-control"></label>
+									</div>
+
+								</div>
+							</div>
+							<!-- / .row -->
+
+						</div>
+						<div class="card-body">
+
+							<!-- <legend style="font-weight: bold; color: grey"> Select Stock </legend> -->
+							<div style="height: 8px;"></div>
+							Select Stock: <select id="stock_list">
+								{% for stock in stock_list %}<option value="{{stock}}"> {{stock}} </option> {% endfor %}
+			  				</select>
+							<hr>
+							<!-- <legend style="font-weight: bold; color: grey"> Stock Summary </legend> -->
+							<span style="display:inline; font-weight: bold;"> Company:</span> <span id="stock_company"> </span>
+							<br>
+							<span style="display:inline; font-weight: bold;"> Industry:</span> <span id="stock_ind"> </span>
+							<br>
+							<div class="row">
+								<div class='col-sm'>
+									<span style="display:inline; font-weight: bold;"> Held:</span> <span id="stock_held"> </span>
+								</div>
+								<div class='col-sm'>
+									<span style="display:inline; font-weight: bold;"> Price:</span> $<span id="stock_price"> </span>
+								</div>
+							</div>
+							<div class="row">
+								<div class='col-sm'>
+									<span style="display:inline; font-weight: bold;"> Variance:</span> <span id="stock_var"> </span>
+								</div>
+								<div class='col-sm'>
+									<span style="display:inline; font-weight: bold;"> Trend:</span> <span id="stock_trend"> </span>
+								</div>
+							</div>
+							<div class="row">
+								<div class='col-sm'>
+									<span style="display:inline; font-weight: bold;"> Suggested Action:</span> <span id="stock_action"> </span>
+								</div>
+								<div class='col-sm'>
+									<span style="display:inline; font-weight: bold;"> Confidence:</span> <span id="stock_conf"> </span>
+								</div>
+							</div>
+							<hr>
+							<div id="graph-container" style = "height:139px">
+								<!-- <legend style="font-weight: bold; color: grey"> Past prices </legend> -->
+								<div class="ct-chart" id="chart_stock"></div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-xl-4">
+
+					<!-- Recommendations -->
+					<div class="card" >
+						<div class="card-header">
+							<div class="row align-items-center">
+								<div class="col">
+
+									<!-- Title -->
+									<h4 class="card-header-title" style="display:inline-block;"> <b>Buy/Sell Recommendations</b></h4>
+									&nbsp;
+									<div class="img-wrap" style="display: inline-block;">
+										<img src="../static/img/info.png" class="navbar-brand-img" alt="?"
+										title="This heatmap shows the distribution of stocks based on trend and variance. Click a tile to show the highest priced matching stocks in the SVE. The white tile is your current selection.">
+									</div>
+
+								</div>
+							</div>
+							<!-- / .row -->
+
+						</div>
+						<div class="card-body">
+							<!-- <legend style="font-weight: bold; color: grey"> Choose Variance and Trend </legend> -->
+							<!-- <center id="current_ai"> </center> -->
+							<div style="height: 8px;"></div>
+							<div id="chart_recommendation" style="max-height: 300px"></div>
+							<div style="height: 8px;"></div>
+						</div>
+					</div>
+				</div>
+
+					<!-- Twitter -->
+				<div class="col-12 col-xl-4">
+
+					<div class="card">
+						<div class="card-header">
+							<div class="row align-items-center">
+								<div class="col">
+
+										<!-- Title -->
+									<h4 class="card-header-title" style="display: inline-block;"> <b>ASX News</b></h4>
+									&nbsp;
+									<div class="img-wrap" style="display: inline-block;">
+										<img src="../static/img/info.png" class="navbar-brand-img" alt="?"
+										title="The latest news from the ASX twitter feed. Click any link to be redirected to the Twitter site.">
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="card-body">
+							<a class="twitter-timeline" height="310" href="https://twitter.com/ASX?ref_src=twsrc%5Etfw"></a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- / .row -->
+		</div>
+
+	</div> <!-- main content -->
+
+
+	<!-- <footer>
+		<p>Project Argos: Hugh Gottlieb, Kevin Gui, Tina Wu & Jiawei Zhu</p>
+	</footer> -->
+
+	<script type="text/javascript" src="{{ url_for('static', filename='js/vendor.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/alchemy.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/home.js')}}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/chartist.js')}}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/chartist-plugin-legend.js')}}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/chartist-plugin-axistitle.js')}}"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+	<script type="text/javascript" src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</body>
+
+</html>

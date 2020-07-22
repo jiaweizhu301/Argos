@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> Project Argos | Login </title>
+    <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico">
+    <link rel="stylesheet" href="{{url_for('static',filename='styles/login.css')}}">
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="login-content">
+            <div class="card card-container">
+
+                <img id="logo" class="logo" src="{{url_for('static', filename='img/logo.jpg')}}" width="200"/>
+                <img id="logo" class="logo" src="{{url_for('static', filename='img/logotext.png')}}" width="300"/>
+
+                <form class="form-signin" action="/" method="post">
+                    <input type="text" id="inputUsername" class="form-control" placeholder="Username" value="{{username}}" required name="user">
+                    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required name="pswd">
+                    <button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Sign in</button>
+                </form>
+
+                <p align="center" style="color:red"> {{error_msg}} </p>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
